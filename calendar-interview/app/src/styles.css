@@ -1,0 +1,39 @@
+.App {
+  font-family: sans-serif;
+  text-align: center;
+}
+
+.hours {
+  grid-template-columns: repeat(8, 1fr);
+  display: grid;
+}
+
+.hour {
+  border-right: 1px solid grey;
+  border-bottom: 1px solid grey;
+  min-width: 40px;
+  min-height: 20px;
+  padding: 5px;
+}
+
+.modal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  background-color: orange;
+  border: 1px solid black;
+  padding: 20px;
+  border-radius: 8px;
+  z-index: 1;
+}
+
+.calendar {
+  position: relative;
+  border-left: 1px solid grey;
+  border-top: 1px solid grey;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: flex-end;
+}
