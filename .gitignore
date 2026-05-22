@@ -1,0 +1,19 @@
+# Ignore macOS system files
+.DS_Store
+
+# Ignore node_modules
+node_modules/
+
+# Ignore build outputs
+dist/
+build/
+
+# Ignore environment files
+.env
+.env.*
+
+# Ignore large files in neckless
+neckless/*.jpeg
+neckless/*.jpg
+neckless/*.png
+neckless/*.pdf
