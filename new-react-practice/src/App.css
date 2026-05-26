@@ -1,0 +1,43 @@
+.App {
+  padding: 16px;
+  background: white;
+}
+
+.calendar {
+  max-width: 1100px;
+  margin: 0 auto;
+  border: 1px solid blue;
+  background: white;
+  position: relative;
+}
+
+.row{
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+}
+
+.col {
+  height: 40px;
+  border: 1px solid steelblue;
+  background: lightblue;
+  position: relative;
+  cursor: pointer;
+  font-size: 11px;
+}
+
+.col span {
+  position: absolute;
+  color: white;
+  border-radius: 4px;
+  padding: 2px 6px;
+  cursor: pointer;
+}
+
+.modal {
+  position: absolute;
+  background: white;
+  border: 1px solid white;
+  border-radius: 8px;
+  padding: 12px;
+  z-index: 50;
+}
