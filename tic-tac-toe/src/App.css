@@ -1,0 +1,100 @@
+.game {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 2rem;
+}
+
+.game h1 {
+  margin: 0;
+  font-size: 2rem;
+  letter-spacing: 0.05em;
+}
+
+.status {
+  font-size: 1.1rem;
+  min-height: 1.5em;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, 5rem);
+  grid-template-rows: repeat(3, 5rem);
+  gap: 6px;
+  background: #444;
+  padding: 6px;
+  border-radius: 8px;
+}
+
+.square {
+  width: 5rem;
+  height: 5rem;
+  font-size: 2.5rem;
+  font-weight: 700;
+  background: #1f1f1f;
+  color: #fafafa;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.square:hover:not(:disabled) {
+  background: #2c2c2c;
+}
+
+.square.win {
+  background: #2e7d32;
+  color: #fff;
+}
+
+.square:disabled {
+  cursor: default;
+}
+
+.controls {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.controls button {
+  padding: 0.5rem 1rem;
+  font-size: 0.95rem;
+  border: 1px solid #555;
+  background: #2a2a2a;
+  color: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.controls button:hover {
+  background: #3a3a3a;
+}
+
+.history {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.history button {
+  background: transparent;
+  border: 1px solid #555;
+  color: #ddd;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.history button.current {
+  background: #555;
+  color: #fff;
+}

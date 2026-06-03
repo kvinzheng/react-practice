@@ -1,0 +1,47 @@
+.calendar {
+  padding: 20px;
+  font-family: system-ui, sans-serif;
+}
+
+.calendar table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.calendar th,
+.calendar td {
+  border: 1px solid #ccc;
+  padding: 8px 12px;
+  text-align: center;
+  min-width: 80px;
+  height: 36px;
+  cursor: pointer;
+}
+
+.calendar th {
+  background: #f4f4f4;
+}
+
+.calendar td.time {
+  background: #fafafa;
+  font-weight: 500;
+  cursor: default;
+}
+
+.calendar td.selected {
+  outline: 2px solid #3b82f6;
+}
+
+.pop-up {
+  margin: 12px 0;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  display: inline-block;
+}
+
+.pop-up form {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}

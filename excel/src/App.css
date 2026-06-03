@@ -1,6 +1,10 @@
 .App {
-  padding: 16px;
-  background: white;
+  padding: 24px;
+  background: #e8e8e8;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
 }
 
 .calendar {

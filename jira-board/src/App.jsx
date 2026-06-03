@@ -1,91 +1,100 @@
-import { useRef, useState } from 'react'
-import './App.css'
+import { useState } from "react";
+import "./App.css";
 
 const INITIAL_BOARD = [
   {
-    id: 'todo',
-    title: 'To Do',
+    id: "todo",
+    title: "To Do",
     cards: [
-      { id: 4, title: 'Add new card creation' },
-      { id: 5, title: 'Write documentation' },
+      { title: "Add new card creation" },
+      { title: "Write documentation" },
     ],
   },
   {
-    id: 'inprogress',
-    title: 'In Progress',
+    id: "inprogress",
+    title: "In Progress",
     cards: [
-      { id: 2, title: 'Design board layout' },
-      { id: 3, title: 'Implement keyboard movement' },
+      { title: "Design board layout" },
+      { title: "Implement keyboard movement" },
     ],
   },
   {
-    id: 'review',
-    title: 'Review',
-    cards: [{ id: 6, title: 'Review PR #42' }],
+    id: "review",
+    title: "Review",
+    cards: [{ title: "Review PR #42" }],
   },
   {
-    id: 'done',
-    title: 'Done',
-    cards: [{ id: 1, title: 'Set up project' }],
+    id: "done",
+    title: "Done",
+    cards: [{ title: "Set up project" }],
   },
-]
+];
 
 function App() {
-  const [board, setBoard] = useState(INITIAL_BOARD)
-  const [activeCell, setActiveCell] = useState(null) // { colId, value } | null
-  const nextIdRef = useRef(100)
+  const [board, setBoard] = useState(INITIAL_BOARD);
+  const [activeCell, setActiveCell] = useState(null); // { colIndex, value } | null
 
   const moveCard = (colIndex, cardIndex, direction) => {
+    // TODO: implement move logic
     setBoard((prev) => {
-      const next = prev.map((col) => ({ ...col, cards: [...col.cards] }))
-
-      if (direction === 'up' || direction === 'down') {
-        const swapIdx = cardIndex + (direction === 'down' ? 1 : -1)
-        const cards = next[colIndex].cards
-        if (swapIdx < 0 || swapIdx >= cards.length) return prev
-        ;[cards[cardIndex], cards[swapIdx]] = [cards[swapIdx], cards[cardIndex]]
-        return next
+      const clone = prev.map((ele) => {
+        return {
+          ...ele,
+          cards: ele.cards.map((card) => ({ ...card })),
+        };
+      });
+      if (direction === "up") {
+        if (cardIndex === 0) return prev;
+        const cards = clone[colIndex].cards;
+        [cards[cardIndex - 1], cards[cardIndex]] = [
+          cards[cardIndex],
+          cards[cardIndex - 1],
+        ];
+      }
+      if (direction === "down") {
+        if (cardIndex === clone[colIndex].cards.length - 1) return prev;
+        const cards = clone[colIndex].cards;
+        [cards[cardIndex + 1], cards[cardIndex]] = [
+          cards[cardIndex],
+          cards[cardIndex + 1],
+        ];
       }
 
-      if (direction === 'left' || direction === 'right') {
-        const newColIndex = colIndex + (direction === 'right' ? 1 : -1)
-        if (newColIndex < 0 || newColIndex >= next.length) return prev
-        const [card] = next[colIndex].cards.splice(cardIndex, 1)
-        next[newColIndex].cards.push(card)
-        return next
+      if (direction === "left") {
+        if (colIndex === 0) return prev;
+
+        const [card] = clone[colIndex].cards.splice(cardIndex, 1);
+        clone[colIndex - 1].cards.push(card);
+        return clone;
       }
 
-      return prev
-    })
-  }
+      if (direction === "right") {
+        if (colIndex === clone.length - 1) return prev;
+
+        const [card] = clone[colIndex].cards.splice(cardIndex, 1);
+        clone[colIndex + 1].cards.push(card);
+        return clone;
+      }
+    });
+  };
 
   const deleteCard = (colIndex, cardIndex) => {
-    setBoard((prev) =>
-      prev.map((col, i) =>
-        i === colIndex
-          ? { ...col, cards: col.cards.filter((_, j) => j !== cardIndex) }
-          : col
-      )
-    )
-  }
+    // TODO: implement delete card logic
+  };
 
   const addCard = () => {
-    if (!activeCell) return
-    const title = activeCell.value.trim()
-    if (!title) {
-      setActiveCell(null)
-      return
-    }
-    const id = nextIdRef.current++
-    setBoard((prev) =>
-      prev.map((col) =>
-        col.id === activeCell.colId
-          ? { ...col, cards: [...col.cards, { id, title }] }
-          : col
-      )
-    )
-    setActiveCell({ colId: activeCell.colId, value: '' })
-  }
+    // TODO: implement add card logic
+    if (!activeCell) return;
+    const title = activeCell.value.trim();
+    setBoard((prev) => {
+      return prev.map((col, i) => {
+        if (i === activeCell.colIndex) {
+          return { ...col, cards: [...col.cards, { title }] };
+        }
+        return col;
+      });
+    });
+  };
 
   return (
     <div className="app">
@@ -107,14 +116,14 @@ function App() {
 
             <div className="cards">
               {col.cards.map((card, cardIndex) => (
-                <div key={card.id} className="card">
+                <div key={cardIndex} className="card">
                   <div className="card-title">{card.title}</div>
                   <div className="card-actions">
                     <button
                       type="button"
                       title="Move left"
                       disabled={colIndex === 0}
-                      onClick={() => moveCard(colIndex, cardIndex, 'left')}
+                      onClick={() => moveCard(colIndex, cardIndex, "left")}
                     >
                       ←
                     </button>
@@ -122,7 +131,7 @@ function App() {
                       type="button"
                       title="Move up"
                       disabled={cardIndex === 0}
-                      onClick={() => moveCard(colIndex, cardIndex, 'up')}
+                      onClick={() => moveCard(colIndex, cardIndex, "up")}
                     >
                       ↑
                     </button>
@@ -130,7 +139,7 @@ function App() {
                       type="button"
                       title="Move down"
                       disabled={cardIndex === col.cards.length - 1}
-                      onClick={() => moveCard(colIndex, cardIndex, 'down')}
+                      onClick={() => moveCard(colIndex, cardIndex, "down")}
                     >
                       ↓
                     </button>
@@ -138,7 +147,7 @@ function App() {
                       type="button"
                       title="Move right"
                       disabled={colIndex === board.length - 1}
-                      onClick={() => moveCard(colIndex, cardIndex, 'right')}
+                      onClick={() => moveCard(colIndex, cardIndex, "right")}
                     >
                       →
                     </button>
@@ -156,7 +165,7 @@ function App() {
             </div>
 
             <div className="add-card">
-              {activeCell?.colId === col.id ? (
+              {activeCell?.colIndex === colIndex ? (
                 <>
                   <input
                     type="text"
@@ -164,21 +173,25 @@ function App() {
                     autoFocus
                     value={activeCell.value}
                     onChange={(e) =>
-                      setActiveCell({ colId: col.id, value: e.target.value })
+                      setActiveCell({ ...activeCell, value: e.target.value })
                     }
                     onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault()
-                        addCard()
-                      } else if (e.key === 'Escape') {
-                        setActiveCell(null)
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        addCard();
+                      } else if (e.key === "Escape") {
+                        setActiveCell(null);
                       }
                     }}
                     onBlur={() => {
-                      if (!activeCell.value.trim()) setActiveCell(null)
+                      if (!activeCell.value.trim()) setActiveCell(null);
                     }}
                   />
-                  <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={addCard}>
+                  <button
+                    type="button"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={addCard}
+                  >
                     Add
                   </button>
                 </>
@@ -186,7 +199,7 @@ function App() {
                 <button
                   type="button"
                   className="add-toggle"
-                  onClick={() => setActiveCell({ colId: col.id, value: '' })}
+                  onClick={() => setActiveCell({ colIndex, value: "" })}
                 >
                   + Add task
                 </button>
@@ -196,7 +209,7 @@ function App() {
         ))}
       </div>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

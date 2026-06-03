@@ -1,0 +1,152 @@
+.app {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 20px 60px;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+h1 {
+  margin: 0;
+  font-size: 32px;
+}
+
+.sub {
+  margin: 4px 0 0;
+  color: #7a6856;
+  font-size: 14px;
+}
+
+main {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+@media (max-width: 800px) {
+  main { grid-template-columns: 1fr; }
+}
+
+.panel {
+  background: #fff;
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(80, 50, 20, 0.08);
+}
+
+.panel h2 {
+  margin: 0 0 12px;
+  font-size: 18px;
+  color: #4a3826;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.count {
+  font-size: 13px;
+  color: #a08d76;
+  font-weight: 500;
+}
+
+.menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.menu button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid #ead9c2;
+  border-radius: 10px;
+  background: #fdf8f1;
+  font-size: 15px;
+  cursor: pointer;
+  transition: transform 0.08s ease, background 0.15s ease;
+}
+
+.menu button:hover {
+  background: #f5e8d3;
+}
+
+.menu button:active {
+  transform: scale(0.98);
+}
+
+.menu .name { flex: 1; text-align: left; }
+.menu .time { font-size: 13px; color: #8a7660; }
+
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 60px;
+}
+
+.list li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #fdf8f1;
+  border: 1px solid #ead9c2;
+  font-size: 15px;
+}
+
+.list .empty {
+  justify-content: center;
+  color: #b3a48d;
+  font-style: italic;
+  background: transparent;
+  border: 1px dashed #d8c6ac;
+}
+
+.list .name { flex: 1; }
+.list .status {
+  font-size: 12px;
+  color: #8a7660;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.list .making {
+  background: #fff4dc;
+  border-color: #f0c97a;
+}
+
+.list .making .status {
+  color: #b8771a;
+  font-weight: 600;
+}
+
+.list .ready {
+  background: #e6f5e1;
+  border-color: #a8d495;
+  animation: pop 0.25s ease;
+}
+
+.list .ready .status {
+  color: #3b8a2c;
+  font-weight: 600;
+}
+
+.emoji { font-size: 22px; }
+
+@keyframes pop {
+  0% { transform: scale(0.9); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
