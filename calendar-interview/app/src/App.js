@@ -14,7 +14,7 @@ import { useState, useEffect } from "react";
 //server side rendeer this
 const events = {
   t1: { name: "event 1", startTime: 8, day: "Mon" },
-  t2: { name: "event 2", startTime: 9, day: "Mon" }
+  t2: { name: "event 2", startTime: 9, day: "Mon" },
 };
 const WEEK = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -37,28 +37,31 @@ export default function App() {
   const [eventsState, setEvents] = useState(events);
   const [open, setOpen] = useState(false);
   const [currentEvent, setCurrentEvent] = useState(null);
+  
   useEffect(() => {
-    const eventValue = Object.entries(eventsState);
-    eventValue.forEach(([taskId, event]) => {
-      const dayIndex = WEEK.indexOf(event.day);
-      const hourIndex = event.startTime;
-      setGrid((prev) => {
-        const clone = prev.map((row) => [...row].map((col) => ({ ...col })));
-        clone[hourIndex][dayIndex] = {
+    setGrid(() => {
+      const eventValue = Object.entries(eventsState);
+
+      const next = generateGrid();
+      eventValue.forEach(([taskId, event]) => {
+        const dayIndex = WEEK.indexOf(event.day);
+        const hourIndex = event.startTime;
+        next[hourIndex][dayIndex] = {
           taskId,
           value: event.name,
         };
-        return clone;
       });
+      return next;
     });
   }, [eventsState]);
-  
+
   const handleOnChange = (e) => {
     setEvents((prev) => ({
       ...prev,
       [currentEvent]: { ...prev[currentEvent], name: e.target.value },
     }));
   };
+
   const handleOnClick = (day, hourIndex, dayIndex) => {
     setOpen(true);
     const existingId = grid[hourIndex][dayIndex].taskId;
@@ -85,6 +88,16 @@ export default function App() {
     setOpen(false);
   };
 
+  const handleDelete = () => {
+    setEvents((prev) => {
+      const clone = { ...prev };
+      console.log("clone[currentEvent]", clone[currentEvent]);
+      delete clone[currentEvent];
+      return clone;
+    });
+    setOpen(false);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
   };
@@ -97,10 +110,14 @@ export default function App() {
               <div className="modal-header">
                 {" "}
                 <button onClick={handleClose}>close</button>
+                <button onClick={handleDelete}>delete</button>
               </div>
               <div>
                 <label>event</label>
-                <input value={eventsState[currentEvent]?.name} onChange={handleOnChange} />
+                <input
+                  value={eventsState[currentEvent]?.name}
+                  onChange={handleOnChange}
+                />
               </div>
             </form>
           </div>
@@ -109,7 +126,11 @@ export default function App() {
         <div className="hours">
           <div className="hour"></div>
           {WEEK.map((day, dayIndex) => {
-            return <div className="hour" key={dayIndex}>{day}</div>;
+            return (
+              <div className="hour" key={dayIndex}>
+                {day}
+              </div>
+            );
           })}
         </div>
         {grid.map((hours, hourIndex) => {

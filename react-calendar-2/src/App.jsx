@@ -1,188 +1,178 @@
-import { useState, useMemo, useRef } from "react";
 import "./styles.css";
+import { useState, useEffect, useMemo } from "react";
+// state
+// 2 d grid
 
-const DAYS = ["", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-const START_HOUR = 8;
-const END_HOUR = 20; // 8 PM
-//requirement
-//1. build 2 d grid - timeline vertically/weekly horizontally
-//2. add event / delete/ edit
-//3. optional (more than 1 event)
+// top row week day
 
-// <Calendar />
-// <td> <EventTainer></td>
+//left column, hours
 
-// <Modal />
+//each grid would have the following
+// [[t1, null, null],[null, null, null]]
 
-// state management
-//1 event
-// const defaultEvent = {
-//   t1: { activity: "pick up" },
-// };
-//2 grid
-// grid boxd state { value: "", status: "enabled", event: "t1" }
-// when creating a new one, i will create a new event id, and map the event state
-//3. modal open
-//4. current row current col which are used for selected
-const generateTimeline = () => {
-  const arr = [];
-  for (let i = START_HOUR; i < END_HOUR; i++) {
-    if (i > 12) {
-      const number = Math.floor(i % 12);
-      arr.push(`${number}.00pm`);
-    } else {
-      arr.push(`${i}.00am`);
-    }
-  }
-  return arr;
+//ideally this would come from API
+//server side rendeer this
+const defaultEvent = {
+  t1: {
+    id: "t1",
+    name: "pick up wife",
+    startTime: 8,
+    day: "Mon",
+  },
 };
+const WEEK = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-const generate2dGrid = () => {
-  const timeline = generateTimeline();
+const HOURS = Array.from({ length: 24 }, (_, hourIndex) => {
+  if (hourIndex < 12) {
+    return `${hourIndex}:00am`;
+  } else {
+    return `${hourIndex % 12}:00pm`;
+  }
+});
 
-  const grid = Array.from({ length: 12 }, (hour, hourIndex) => {
-    return Array.from({ length: 8 }, (weekDay, weekIndex) => {
-      if (weekIndex === 0) {
-        return {
-          value: timeline[hourIndex],
-          status: "disabled",
-          event: null,
-          location: `${hourIndex}_${weekIndex}`,
-          row: hourIndex,
-          col: weekIndex,
-        };
-      }
-      return { value: "", status: "enabled", event: null };
+const generateGrid = () => {
+  return Array.from({ length: 24 }, (_, hourIndex) => {
+    return Array.from({ length: 7 }, (_, weekIndex) => {
+      return { value: null, taskId: null };
     });
   });
-  grid.unshift(DAYS);
-  return grid;
+};
+
+const mockEvents = () => {
+  return new Promise((resolve, reject) => {
+    resolve(defaultEvent);
+  });
 };
 export default function App() {
-  // const [grid, setGrid] = useState(generate2dGrid());
+  // const [grid, setGrid] = useState(generateGrid());
+  const [events, setEvents] = useState(defaultEvent);
   const [open, setOpen] = useState(false);
-  const [currentRow, setCurrentRow] = useState(null);
-  const [currentCol, setCurrentCol] = useState(null);
-  const nextIdRef = useRef(1);
-  const [events, setEvent] = useState({});
-
-  const grid = useMemo(() => {
-    const g = generate2dGrid();
-    console.log("Object.entries(events)", Object.entries(events));
-    Object.entries(events).forEach(([id, ev]) => {
-      g[ev.row][ev.col].event = id;
-    });
-    return g;
-  }, [events]);
-  const handleOnClick = (hour, weekDay) => {
-    setOpen(true);
-    if (!grid[hour][weekDay].event) {
-      const eventId = `t${nextIdRef.current++}`;
-      setCurrentRow(hour);
-      setCurrentCol(weekDay);
-      // setGrid((prev) => {
-      //   const clone = prev.map((row) => row.map((col) => ({ ...col })));
-      //   clone[hour][weekDay].event = eventId;
-      //   return clone;
-      // });
-      setEvent((event) => {
-        const clone = { ...event };
-        clone[eventId] = { activity: "new event", row: hour, col: weekDay };
-        return clone;
-      });
-    } else {
-      setCurrentRow(hour);
-      setCurrentCol(weekDay);
-    }
+  const [input, setInput] = useState("");
+  const [currentEvent, setCurrentEven] = useState(null);
+  const fetchEvent = async () => {
+    setEvents(await mockEvents());
   };
-  const handleEdit = (e) => {
-    const eventId = grid[currentRow][currentCol].event;
-    setEvent((event) => {
-      const clone = { ...event };
-      clone[eventId] = { ...clone[eventId], activity: e.target.value };
+  useEffect(() => {
+    fetchEvent();
+  }, []);
+  const grid = useMemo(() => {
+    const eventValue = Object.entries(events);
+    const cloneGrid = generateGrid();
+    eventValue.forEach(([taskId, event]) => {
+      const dayIndex = WEEK.indexOf(event.day);
+      const hourIndex = event.startTime;
+      cloneGrid[hourIndex][dayIndex] = {
+        taskId,
+        value: event.name,
+      };
+    });
+    return cloneGrid
+  }, [events]);
+
+  const handleOnChange = (e) => {
+    setInput(e.target.value);
+  };
+  const handleOnClick = (day, hourIndex, dayIndex) => {
+    setOpen(true);
+    setCurrentEven(grid[hourIndex][dayIndex].taskId);
+    console.log("day.value", day.value);
+    if (day.value) {
+      setInput(grid[hourIndex][dayIndex].value);
+      return;
+    }
+
+    const eventLength = Object.keys(events).length;
+    const id = `t${eventLength + 1}`;
+
+    //create a new event
+    setEvents((prev) => {
+      const clone = { ...prev };
+      clone[id] = {
+        id,
+        name: grid[hourIndex][dayIndex].value || "new event",
+        startTime: hourIndex,
+        day: WEEK[dayIndex],
+      };
+      return clone;
+    });
+    setCurrentEven(id);
+    setInput("new event");
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setEvents((prev) => {
+      const clone = { ...prev };
+      clone[currentEvent] = {
+        ...clone[currentEvent],
+        name: input,
+      };
       return clone;
     });
   };
 
   const handleDelete = () => {
-    const eventId = grid[currentRow][currentCol].event;
-
-    // setGrid((prev) => {
-    //   const clone = prev.map((row) => row.map((col) => ({ ...col })));
-    //   clone[currentRow][currentCol] = {
-    //     value: "",
-    //     status: "enabled",
-    //     event: "",
-    //   };
-    //   return clone;
-    // });
-    setEvent((event) => {
-      const clone = { ...event };
-      delete clone[eventId];
+    setEvents((prev) => {
+      const clone = { ...prev };
+      delete clone[currentEvent];
       return clone;
     });
-    setCurrentRow(null);
-    setCurrentCol(null);
-    setOpen(false);
-  };
 
-  const value =
-    currentRow === null || currentCol === null
-      ? ""
-      : events[grid[currentRow][currentCol].event]?.activity ?? "";
-  const handleClose = () => {
+    setCurrentEven(null);
+    setInput("");
     setOpen(false);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
   };
-
+  // Memo(<Component />)
+  // Memo()
   return (
-    <div className="calendar" style={{ padding: 20 }}>
-      <h1>Weekly Calendar</h1>
-
-      <div className="pop-up">
+    <div className="App">
+      <div className="calendar">
         {open && (
-          <form onSubmit={handleSubmit}>
-            input event name
-            <input value={value} onChange={handleEdit} />
-            <button type="button" onClick={handleClose}>close</button>
-            <button type="button" onClick={handleDelete}>delete</button>
-          </form>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <form onSubmit={handleSubmit}>
+              <div className="modal-header">
+                {" "}
+                <button onClick={handleClose}>close</button>
+                <button type="button" onClick={handleDelete}>
+                  delete
+                </button>
+              </div>
+              <div>
+                <label>event</label>
+                <input value={input} onChange={handleOnChange} />
+              </div>
+            </form>
+          </div>
         )}
-      </div>
-      <table>
-        <thead>
-          <tr>
-            {grid[0].map((day) => (
-              <th>{day}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {grid.slice(1).map((hour, hourIndex) => {
-            return (
-              <tr>
-                {hour.map((weekDay, weekDayIndex) => {
-                  return (
-                    <td
-                      onClick={() => {
-                        if (weekDay.status === "disabled") return;
-                        handleOnClick(hourIndex + 1, weekDayIndex);
-                      }}
-                    >
-                      {weekDayIndex === 0
-                        ? weekDay.value
-                        : events[weekDay.event]?.activity}
-                    </td>
-                  );
-                })}
-              </tr>
-            );
+
+        <div className="hours">
+          <div className="hour"></div>
+          {WEEK.map((day, dayIndex) => {
+            return <div className="hour">{day}</div>;
           })}
-        </tbody>
-      </table>
+        </div>
+        {grid.map((hours, hourIndex) => {
+          return (
+            <div className="hours">
+              <div className="hour">{HOURS[hourIndex]}</div>
+              {hours.map((day, dayIndex) => {
+                return (
+                  <div
+                    className="hour"
+                    onClick={() => handleOnClick(day, hourIndex, dayIndex)}
+                  >
+                    {day.value}
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
